@@ -22,7 +22,7 @@ features = joblib.load("feature_names.pkl")
 # ================================
 # App Title
 # ================================
-st.title("📊 Customer Churn Prediction Dashboard")
+st.title("Customer Churn Prediction")
 
 # ================================
 # Download Template CSV
