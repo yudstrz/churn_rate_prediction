@@ -1,4 +1,4 @@
-import numpy as pd # Using pd alias for backwards compat with `pd.DataFrame` downstream. Note: Using numpy for random generation, then wrapping in pandas
+import pandas as pd
 import numpy as np
 
 def get_template_data(features):
