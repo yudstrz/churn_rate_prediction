@@ -3,9 +3,21 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
+def _apply_minimal_theme(fig):
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="system-ui, -apple-system, sans-serif", color="#F8FAFC", size=12),
+        hoverlabel=dict(bgcolor="#1E293B", font_color="#F8FAFC", bordercolor="#475569"),
+        xaxis=dict(gridcolor="rgba(51, 65, 85, 0.4)", zerolinecolor="rgba(51, 65, 85, 0.6)"),
+        yaxis=dict(gridcolor="rgba(51, 65, 85, 0.4)", zerolinecolor="rgba(51, 65, 85, 0.6)")
+    )
+    return fig
+
 def style_dataframe(df):
     def highlight_row(row):
-        color = 'background-color: rgba(255, 75, 75, 0.1)' if row.get('High Risk', 0) == 1 else ''
+        color = 'background-color: rgba(239, 68, 68, 0.15)' if row.get('High Risk', 0) == 1 else ''
         return [color] * len(row)
     return df.style.apply(highlight_row, axis=1)
 
@@ -18,8 +30,8 @@ def plot_density_chart(df, threshold):
         histnorm="probability density",
         name="Density",
         nbinsx=20,
-        marker_color="rgba(37, 99, 235, 0.4)",
-        marker_line_color="#2563EB",
+        marker_color="rgba(37, 99, 235, 0.35)",
+        marker_line_color="#3B82F6",
         marker_line_width=1.5,
     ))
 
@@ -51,7 +63,7 @@ def plot_density_chart(df, threshold):
         margin=dict(l=20, r=20, t=40, b=20),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
-    return fig
+    return _apply_minimal_theme(fig)
 
 def plot_interactive_histogram(df, threshold):
     fig_plotly = px.histogram(
@@ -59,7 +71,7 @@ def plot_interactive_histogram(df, threshold):
         x="Churn Probability",
         nbins=20,
         title="Distribution (Count)",
-        color_discrete_sequence=["#2563EB"]
+        color_discrete_sequence=["#3B82F6"]
     )
     fig_plotly.add_vline(
         x=threshold,
@@ -72,7 +84,7 @@ def plot_interactive_histogram(df, threshold):
         yaxis_title="Count",
         margin=dict(l=20, r=20, t=40, b=20)
     )
-    return fig_plotly
+    return _apply_minimal_theme(fig_plotly)
 
 def plot_feature_importance(model, features):
     importances = getattr(model, "feature_importances_", None)
@@ -90,13 +102,13 @@ def plot_feature_importance(model, features):
         orientation="h",
         title="Model Feature Importance (Key Drivers)",
         color="Importance",
-        color_continuous_scale="Blues"
+        color_continuous_scale=["#1E293B", "#2563EB", "#60A5FA"]
     )
     fig.update_layout(
         margin=dict(l=20, r=20, t=40, b=20),
         coloraxis_showscale=False
     )
-    return fig
+    return _apply_minimal_theme(fig)
 
 def plot_value_risk_scatter(df, threshold):
     charge_cols = [c for c in ["total day charge", "total eve charge", "total night charge", "total intl charge"] if c in df.columns]
@@ -118,7 +130,7 @@ def plot_value_risk_scatter(df, threshold):
     )
     fig.add_vline(x=threshold, line_dash="dash", line_color="#EF4444", annotation_text="Risk Threshold")
     if median_charge > 0:
-        fig.add_hline(y=median_charge, line_dash="dot", line_color="#94A3B8", annotation_text="Median Spend")
+        fig.add_hline(y=median_charge, line_dash="dot", line_color="#64748B", annotation_text="Median Spend")
 
     fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
-    return fig
+    return _apply_minimal_theme(fig)

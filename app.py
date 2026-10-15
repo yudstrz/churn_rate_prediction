@@ -23,18 +23,119 @@ from src.visualizations import (
     plot_value_risk_scatter
 )
 
+def inject_custom_styles():
+    st.markdown(
+        """
+        <style>
+        /* Base typography & layout */
+        html, body, [class*="css"] {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #F8FAFC;
+        }
+
+        /* Prevent horizontal overflow on mobile */
+        [data-testid="stAppViewContainer"] {
+            overflow-x: hidden;
+            padding-bottom: 2rem;
+        }
+
+        /* Responsive Metric Cards */
+        [data-testid="stMetric"] {
+            background-color: #1E293B;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: none;
+            transition: border-color 0.2s ease;
+        }
+
+        [data-testid="stMetric"]:hover {
+            border-color: #475569;
+        }
+
+        [data-testid="stMetricLabel"] {
+            color: #94A3B8 !important;
+            font-size: 0.85rem !important;
+            font-weight: 500;
+        }
+
+        [data-testid="stMetricValue"] {
+            color: #F8FAFC !important;
+            font-size: 1.6rem !important;
+            font-weight: 600;
+        }
+
+        /* Mobile reflow: Stack metric columns on screens <= 768px */
+        @media (max-width: 768px) {
+            [data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+                margin-bottom: 12px;
+            }
+
+            .main .block-container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+                padding-top: 1.5rem !important;
+            }
+
+            h1 {
+                font-size: 1.65rem !important;
+            }
+
+            h2 {
+                font-size: 1.35rem !important;
+            }
+
+            h3 {
+                font-size: 1.15rem !important;
+            }
+        }
+
+        /* Accessible 44px minimum tap targets */
+        button, [role="tab"], .stDownloadButton > button, .stCheckbox > label {
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+        }
+
+        /* Minimalist Tabs */
+        button[role="tab"] {
+            padding: 10px 18px !important;
+            font-size: 0.95rem !important;
+            font-weight: 500 !important;
+            color: #94A3B8 !important;
+            border-radius: 6px 6px 0 0 !important;
+        }
+
+        button[role="tab"][aria-selected="true"] {
+            color: #38BDF8 !important;
+            border-bottom: 2px solid #38BDF8 !important;
+        }
+
+        /* Form elements & sliders */
+        .stSelectbox, .stSlider {
+            margin-bottom: 1rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 def setup_page():
     st.set_page_config(
         page_title="Customer Churn Prediction",
         layout="wide",
         initial_sidebar_state="expanded"
     )
+    inject_custom_styles()
 
 def render_header():
     st.title("Customer Churn Prediction Dashboard")
     st.markdown(
-        "Identify high-risk customers, analyze churn probability distributions, "
-        "and explore actionable retention insights using XGBoost."
+        "Identify high-risk accounts, examine revenue exposure, "
+        "and simulate retention outcomes with XGBoost."
     )
     st.divider()
 
@@ -59,7 +160,8 @@ def render_sidebar(features):
             label="Download CSV Template",
             data=csv_data,
             file_name="customer_template.csv",
-            mime="text/csv"
+            mime="text/csv",
+            use_container_width=True
         )
 
     return uploaded_file, use_sample
