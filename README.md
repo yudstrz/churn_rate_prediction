@@ -1,72 +1,110 @@
 # Customer Churn Prediction Dashboard
 
-A machine learning-powered dashboard for predicting customer churn. Upload customer data to identify high-risk accounts, analyze churn probability distributions, and generate actionable retention insights — built with XGBoost and Streamlit.
+A machine learning interactive dashboard for predicting customer churn. Upload customer data to identify high-risk accounts, analyze churn probability distributions, and generate actionable retention insights, built with XGBoost and Streamlit.
 
 ## Features
 
 - **Predictive Analytics:** Upload customer demographic and usage data (CSV) to get instant churn probability predictions.
-- **High-Risk Identification:** Automatically flags customers with a >70% calculated risk of canceling their subscription.
-- **Interactive Visualizations:**
-  - Probability density distribution using Matplotlib & Seaborn.
-  - Interactive histograms built with Plotly.
-- **Summary Metrics:** Quick overview of the total analyzed base, high-risk volume, and average churn probability.
-- **Modular Data Generation:** Includes a downloadable CSV template with 100 realistic customer profile examples to test the system immediately.
+- **One-Click Sample Data:** Test the dashboard immediately with the bundled realistic dataset without manual uploads.
+- **High-Risk Customer Identification:** Automatically flags accounts with a >70% calculated risk of canceling their subscription.
+- **Visualizations:** Probability density distribution using Matplotlib and Seaborn, plus interactive histograms built with Plotly.
+- **Summary Metrics:** Overview of the total analyzed base, high-risk volume, and average churn probability.
+- **Downloadable CSV Template:** Download the expected schema template directly from the app.
 
 ## Tech Stack
 
-- **Frontend / Dashboard Framework:** [Streamlit](https://streamlit.io/)
-- **Machine Learning / Inference:** `XGBoost`, `scikit-learn`
-- **Data Manipulation:** `pandas`, `numpy`
-- **Visualization:** `matplotlib`, `seaborn`, `plotly`
+- **Dashboard Framework:** Streamlit
+- **Machine Learning / Inference:** XGBoost, scikit-learn, joblib
+- **Data Manipulation:** pandas, numpy
+- **Visualization:** matplotlib, seaborn, plotly
+- **Quality Assurance:** Python standard library `unittest`
 
-## Repository Structure
+## Project Structure
 
 ```text
 churn_rate_prediction/
-├── churnrate.py            # Main entry point for the Streamlit application
-├── models/                 # Pre-trained machine learning artifacts
-│   ├── xgb_churn_model.pkl # The trained XGBoost model
-│   ├── scaler.pkl          # Feature scaler used during training
-│   └── feature_names.pkl   # Expected feature list/order
-├── src/                    # Application source code modules
+├── .streamlit/
+│   └── config.toml             # Streamlit UI theme and server configuration
+├── data/                       # Datasets and sample templates
+│   ├── README.md               # Data dictionary and feature documentation
+│   └── sample_customers.csv    # Ready-to-use sample dataset for testing
+├── models/                     # Pre-trained machine learning artifacts
+│   ├── feature_names.pkl       # Feature list and ordering expected by model
+│   ├── scaler.pkl              # Fitted scaler
+│   └── xgb_churn_model.pkl     # Trained XGBoost classification model
+├── src/                        # Application backend
+│   ├── __init__.py             # Package declaration
+│   ├── config.py               # Path resolutions and thresholds
+│   ├── data_processing.py      # Preprocessing, data cleaning, and template generation
+│   ├── inference.py            # Model loading and batch inference
+│   └── visualizations.py       # Charting routines
+├── tests/                      # Automated unit test suite
 │   ├── __init__.py
-│   ├── config.py           # Universal path references and thresholds
-│   ├── data_processing.py  # Data cleaning and template generation logic
-│   ├── inference.py        # Scripts to load models and predict churn
-│   └── visualizations.py   # Seperated charting logic (Seaborn & Plotly)
-├── requirements.txt        # Deployment dependencies
-└── README.md
+│   ├── test_config.py          # Configuration and file path validation tests
+│   └── test_data_processing.py # Data preprocessing and column check tests
+├── .env.example                # Environment variables template
+├── .gitignore                  # Git ignore rules for Python and Streamlit
+├── app.py                      # Primary Streamlit application entry point
+├── churnrate.py                # Legacy entry point (backward compatibility)
+├── requirements.txt            # Dependencies
+├── LICENSE                     # Open-source license
+└── README.md                   # Project documentation
 ```
 
 ## Setup and Installation
 
-### Local Development
+### 1. Clone the Repository
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/YourUsername/churn_rate_prediction.git
-   cd churn_rate_prediction
-   ```
+```bash
+git clone https://github.com/yudstrz/churn_rate_prediction.git
+cd churn_rate_prediction
+```
 
-2. **Create a virtual environment (Optional but Recommended):**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   ```
+### 2. Create and Activate Virtual Environment
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+**On Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
-4. **Run the application:**
-   ```bash
-   streamlit run churnrate.py
-   ```
+**On macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running the Application
+
+Launch the Streamlit web dashboard:
+
+```bash
+streamlit run app.py
+```
+
+> Note: The legacy entry command `streamlit run churnrate.py` remains supported and forwards to `app.py`.
+
+## Running Automated Tests
+
+Run the built-in test suite:
+
+```bash
+python -m unittest discover tests
+```
 
 ## Usage Instructions
 
-1. Upon launching the app, click **"Download CSV Template"** from the left sidebar to obtain a sample dataset with 100 realistic records.
-2. In the sidebar, use the **File Uploader** to upload the template you just downloaded (or provide your own data strictly matching the template's column structure).
-3. Review the overview metrics at the top to see how many customers fall under the "High Risk" category.
-4. Switch between the **"Data & Predictions"** and **"Probability Distribution"** tabs to investigate individual rows or macro-trends.
+1. **Launch the dashboard:** Follow the run command above to open the application in your browser (`http://localhost:8501`).
+2. **Instant Test:** By default, the app loads `data/sample_customers.csv` via the **"Use Sample Dataset"** toggle so you can immediately see predictions and analytics.
+3. **Upload Your Data:** Uncheck the sample toggle or use the **File Uploader** in the left sidebar to upload your own customer CSV.
+4. **Download Template:** Click **"Download CSV Template"** in the sidebar if you need an empty reference format matching the model's schema.
+5. **Explore Insights:**
+   - Review **Overview Metrics** (Total Analyzed, High Risk Volume, Average Churn Probability).
+   - Navigate the **"Data & Predictions"** tab to inspect row-level predictions.
+   - Navigate the **"Probability Distribution"** tab for visual risk curves and histograms.

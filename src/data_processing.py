@@ -1,13 +1,12 @@
+import os
 import pandas as pd
 import numpy as np
+from src.config import SAMPLE_DATA_PATH
 
 def get_template_data(features):
-    """Generate 100 rows of dummy data for the CSV download template, with realistic high/low risk distributions."""
-    np.random.seed(42)  # For reproducibility
+    np.random.seed(42)
     n_samples = 100
     
-    # Generate mix of normal customers and "high risk" profiles
-    # High risk typically has: more customer service calls, high day charges, international plan = yes
     is_high_risk = np.random.choice([0, 1], size=n_samples, p=[0.75, 0.25])
     
     dummy_data = {
@@ -20,7 +19,6 @@ def get_template_data(features):
         "total day calls": np.random.randint(50, 150, n_samples),
     }
     
-    # Derive charges based on minutes (approximate rates)
     dummy_data["total day charge"] = dummy_data["total day minutes"] * 0.17
     
     dummy_data.update({
@@ -41,10 +39,8 @@ def get_template_data(features):
     })
     dummy_data["total intl charge"] = dummy_data["total intl minutes"] * 0.27
     
-    # High risk correlates strongly with customer service calls
-    dummy_data["customer service calls"] = np.where(is_high_risk, np.random.randint(3, 8, n_samples), np.random.randint(0, 3, n_samples))
+    dummy_data["customer service calls"] = np.where(is_high_risk, np.random.randint(3, 8, n_samples), np.random.randint(0, 2, n_samples))
     
-    # Ensure all values are non-negative
     for col in dummy_data:
         if isinstance(dummy_data[col][0], (int, float)):
              dummy_data[col] = np.maximum(0, dummy_data[col])
@@ -55,10 +51,8 @@ def get_template_data(features):
     return pd.DataFrame(dummy_data)
 
 def preprocess_data(df):
-    """Clean and preprocess uploaded data for modeling."""
     df_clean = df.copy()
     
-    # Convert categorical plans into binary (0/1)
     if "international plan" in df_clean.columns:
         df_clean["international plan"] = (
             df_clean["international plan"]
@@ -74,12 +68,15 @@ def preprocess_data(df):
             .map({"yes": 1, "no": 0})
         )
     
-    # Drop state column if present
     if "state" in df_clean.columns:
         df_clean = df_clean.drop(columns=["state"])
         
     return df_clean
 
 def check_missing_columns(df, features):
-    """Check if uploaded dataframe contains all the required model features."""
     return set(features) - set(df.columns)
+
+def load_sample_data(sample_path=SAMPLE_DATA_PATH):
+    if os.path.exists(sample_path):
+        return pd.read_csv(sample_path)
+    return None
