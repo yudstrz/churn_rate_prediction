@@ -95,7 +95,7 @@ def render_predictions(df_results):
 
         with col_chart1:
             fig_density = plot_density_chart(df_results, CHURN_THRESHOLD)
-            st.pyplot(fig_density)
+            st.plotly_chart(fig_density, use_container_width=True)
 
         with col_chart2:
             fig_interactive = plot_interactive_histogram(df_results, CHURN_THRESHOLD)
