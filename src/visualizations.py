@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
@@ -72,3 +73,52 @@ def plot_interactive_histogram(df, threshold):
         margin=dict(l=20, r=20, t=40, b=20)
     )
     return fig_plotly
+
+def plot_feature_importance(model, features):
+    importances = getattr(model, "feature_importances_", None)
+    if importances is None or len(importances) != len(features):
+        return None
+    fi_df = pd.DataFrame({
+        "Feature": features,
+        "Importance": importances
+    }).sort_values("Importance", ascending=True)
+
+    fig = px.bar(
+        fi_df,
+        x="Importance",
+        y="Feature",
+        orientation="h",
+        title="Model Feature Importance (Key Drivers)",
+        color="Importance",
+        color_continuous_scale="Blues"
+    )
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=40, b=20),
+        coloraxis_showscale=False
+    )
+    return fig
+
+def plot_value_risk_scatter(df, threshold):
+    charge_cols = [c for c in ["total day charge", "total eve charge", "total night charge", "total intl charge"] if c in df.columns]
+    total_charges = df[charge_cols].sum(axis=1) if charge_cols else pd.Series(0, index=df.index)
+    plot_df = df.copy()
+    plot_df["Total Monthly Charges ($)"] = total_charges
+    plot_df["Risk Category"] = plot_df["High Risk"].map({1: "High Risk", 0: "Low/Medium Risk"})
+
+    median_charge = total_charges.median()
+
+    fig = px.scatter(
+        plot_df,
+        x="Churn Probability",
+        y="Total Monthly Charges ($)",
+        color="Risk Category",
+        color_discrete_map={"High Risk": "#EF4444", "Low/Medium Risk": "#3B82F6"},
+        hover_data=["customer service calls", "total day minutes"] if "customer service calls" in df.columns else None,
+        title="Customer Value vs Churn Risk Matrix"
+    )
+    fig.add_vline(x=threshold, line_dash="dash", line_color="#EF4444", annotation_text="Risk Threshold")
+    if median_charge > 0:
+        fig.add_hline(y=median_charge, line_dash="dot", line_color="#94A3B8", annotation_text="Median Spend")
+
+    fig.update_layout(margin=dict(l=20, r=20, t=40, b=20))
+    return fig
